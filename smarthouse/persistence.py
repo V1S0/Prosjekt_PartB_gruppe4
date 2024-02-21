@@ -1,6 +1,6 @@
 import sqlite3
 from typing import Optional
-from smarthouse.domain import Measurement
+from smarthouse.domain import measurement
 
 class SmartHouseRepository:
     """
@@ -36,12 +36,16 @@ class SmartHouseRepository:
         all referenced objects within the object structure (e.g. floors, rooms, devices) 
         are retrieved as well. 
         """
-        # TODO: START here! remove the following stub implementation and implement this function 
-        #       by retrieving the data from the database via SQL `SELECT` statements.
-        return NotImplemented
+        with self.conn.cursor() as cursor:
+
+        # Fetch all rooms
+            cursor.execute("SELECT id, floor, area, name FROM rooms")
+            rooms = cursor.fetchall()
+        return rooms
+        
 
 
-    def get_latest_reading(self, sensor) -> Optional[Measurement]:
+    def get_latest_reading(self, sensor) -> Optional[measurement]:
         """
         Retrieves the most recent sensor reading for the given sensor if available.
         Returns None if the given object has no sensor readings.
