@@ -1,6 +1,7 @@
 import sqlite3
 from typing import Optional
 from smarthouse.domain import measurement
+from smarthouse.domain import SmartHouse
 
 class SmartHouseRepository:
     """
@@ -29,19 +30,43 @@ class SmartHouseRepository:
         self.conn = sqlite3.connect(self.file)
 
     
-    def load_smarthouse_deep(self):
+    def load_smarthouse_deep(self): 
         """
         This method retrives the complete single instance of the _SmartHouse_ 
         object stored in this database. The retrieval yields a _deep_ copy, i.e.
         all referenced objects within the object structure (e.g. floors, rooms, devices) 
         are retrieved as well. 
         """
-        with self.conn.cursor() as cursor:
+        cursor = self.cursor()
 
         # Fetch all rooms
-            cursor.execute("SELECT id, floor, area, name FROM rooms")
-            rooms = cursor.fetchall()
-        return rooms
+        #cursor.execute("select * from rooms r , devices d where d.room = r.id")
+        #rooms = cursor.fetchall()
+
+        #henter alle floors
+        cursor.execute("SELECT DISTINCT  floor from rooms;")
+        floors = cursor.fetchall()
+
+        allfloors = list(floors)
+    
+        #henter alle rooms
+        cursor.execute("select * from rooms r;")
+        rooms = cursor.fetchall()
+        allrooms = list(rooms)
+
+        #henter vi alle devices
+        cursor.execute("select * from devices d;")
+        devices= cursor.fetchall()
+        alldevices = list(devices)
+
+        smarthjem = SmartHouse()
+        smarthjem.floors = allfloors
+        smarthjem.rooms = allrooms
+        smarthjem.devices = alldevices
+
+
+        return smarthjem
+        
         
 
 
