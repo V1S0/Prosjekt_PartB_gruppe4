@@ -1,7 +1,10 @@
+from math import prod
 import sqlite3
 from typing import Optional
 from smarthouse.domain import measurement
 from smarthouse.domain import SmartHouse
+from smarthouse.domain import sensor
+from smarthouse.domain import actuator
 
 class SmartHouseRepository:
     """
@@ -55,14 +58,47 @@ class SmartHouseRepository:
         allrooms = list(rooms)
 
         #henter vi alle devices
-        cursor.execute("select * from devices d;")
+        cursor.execute("select * from devices d, rooms r where d.room = r.id;")
         devices= cursor.fetchall()
         alldevices = list(devices)
 
         smarthjem = SmartHouse()
-        smarthjem.floors = allfloors
-        smarthjem.rooms = allrooms
-        smarthjem.devices = alldevices
+
+        for f in allfloors:
+            smarthjem.register_floor(f)
+
+        
+        ##må finne en måte å hente ut all info pr rom for å bruke register_room
+        for r in rooms:
+            name = r[3]
+            area = r[2]
+            floor = r[1]
+            smarthjem.register_room(floor, area, name)
+
+
+        for d in alldevices:
+            id = d[0]
+            room = d[9]
+            for allerom in smarthjem.rooms:
+                if room == allerom.room_name:
+                    room = allerom
+
+            kind = d[2]
+            category = d[3]     #actuator or sensor
+            supplier = d[4]
+            product = d[5]
+#problem her fordi vi får rom som nummer og ikke som navn
+            #fikset nå får vi romnavnet men ikke romobjektet
+            if category == 'sensor':
+                sensorToAdd = sensor(id, supplier, product, kind, kind,room,kind)
+                smarthjem.register_device(room, sensorToAdd)
+            if category == 'actuator':
+                actuatorToAdd = actuator(id, supplier, product, kind, kind,room, False)
+                smarthjem.register_device(room, actuatorToAdd)
+
+
+       ## smarthjem.rooms = allrooms
+        ##smarthjem.devices = alldevices
 
 
         return smarthjem
