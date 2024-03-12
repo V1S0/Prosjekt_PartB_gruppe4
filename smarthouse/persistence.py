@@ -1,4 +1,4 @@
-from math import prod
+#from math import prod
 import sqlite3
 from typing import Optional
 from smarthouse.domain import measurement
@@ -112,7 +112,21 @@ class SmartHouseRepository:
         Returns None if the given object has no sensor readings.
         """
         # TODO: After loading the smarthouse, continue here
-        return NotImplemented
+        id = sensor.id
+        cursor = self.cursor()
+        cursor.execute(f"select * from measurements where device = '{id}';")
+        allSensorMeasurements = cursor.fetchall()
+        if allSensorMeasurements:
+            lastMeasurement = allSensorMeasurements[-1]
+            sensor.addMeasurement(lastMeasurement[2], lastMeasurement[3], lastMeasurement[1])
+            
+            return sensor.last_measurement()
+
+        else:
+            return None
+
+
+        
 
 
     def update_actuator_state(self, actuator):
@@ -141,7 +155,58 @@ class SmartHouseRepository:
         """
         # TODO: This and the following statistic method are a bit more challenging. Try to design the respective 
         #       SQL statements first in a SQL editor like Dbeaver and then copy it over here.  
-        return NotImplemented
+        print(room)
+        print(room)
+        print(room)
+        print(room)
+        print(room)
+        print(room)
+        print(room)
+        roomName = room.room_name
+
+        print("dette er romnavn")
+        print(roomName)
+
+
+
+        cursor = self.cursor()
+        #finding all devices in the given room
+
+        
+        cursor.execute(f"select id from rooms r where name ='{roomName}';")   #kan være den returnerer en tuple og ikke int
+        roomid = cursor.fetchone()
+        print(roomid)
+        print(roomid)
+        print(roomid)
+        print(roomid)
+        print(roomid)
+        print(roomid)
+        print(roomid)
+        print(roomid)
+        print(roomid[0])
+        print(type(roomid))
+        
+        """"
+        devicesInRoom = cursor.execute(f"select * from devices d where room = {roomid};")
+
+        deviceID= []
+
+        for device in devicesInRoom:
+            deviceID = device[0]
+
+        for 
+        '°C'
+        """""
+        cursor.execute(f"SELECT AVG(m.value) AS avg_value FROM measurements m JOIN devices d ON m.device = d.id JOIN rooms r ON d.room = r.id WHERE m.unit = '°C' AND r.id = {roomid[0]} AND m.ts >= {from_date} AND m.ts <= {until_date};")
+        avg = cursor.fetchall()
+
+        print(avg)
+
+        svar = {from_date: avg}
+
+    
+
+        return svar
 
     
     def calc_hours_with_humidity_above(self, room, date: str) -> list:

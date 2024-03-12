@@ -2,6 +2,7 @@ from multiprocessing import Value
 from pickle import TRUE
 from sqlite3 import Timestamp
 from typing import Optional
+from datetime import datetime
 
 
 class measurement:
@@ -197,8 +198,9 @@ class sensor(Device):
         return self.measurements[-1]
 
         
-    def addMeasurement(self,value,unit):
-        t = Timestamp.now()
+    def addMeasurement(self,value,unit, t):
+        #t = datetime.now()
+       
 
         self.measurements.append(measurement(t,value, unit))
 
