@@ -1,3 +1,4 @@
+import datetime
 from smarthouse.domain import Device, SmartHouse, sensor, actuator
 
 DEMO_HOUSE = SmartHouse()
@@ -53,7 +54,7 @@ DEMO_HOUSE.register_device(Masterbedroom, smart_oven2)
 
 Temperature_sensor = sensor("4d8b1d62-7921-4917-9b70-bbd31f6e2e8e", "AetherCorp", "SmartTemp 42","sensor","Temperature sensor",Masterbedroom,"°C")
 DEMO_HOUSE.register_device(Masterbedroom, Temperature_sensor)
-Temperature_sensor.addMeasurement(0.0,"°C")
+Temperature_sensor.addMeasurement(0.0,"°C",'t')
 
 Air_Quality_Sensor = sensor("7c6e35e1-2d8b-4d81-a586-5d01a03bb02c", "CelestialSense Technologies", "AeroGuard Pro","sensor","Air Quality Sensor",guestRoom3,"co2")
 DEMO_HOUSE.register_device(guestRoom3, Air_Quality_Sensor)

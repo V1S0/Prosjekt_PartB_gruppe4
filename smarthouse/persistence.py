@@ -103,8 +103,6 @@ class SmartHouseRepository:
         cursor.execute("SELECT id from devices d where category = 'actuator'; ")
         actuators = cursor.fetchall()
 
-        print(actuators)
-
 
         return smarthjem
         
@@ -142,7 +140,17 @@ class SmartHouseRepository:
         #       by creating a new table (`CREATE`), adding some data to it (`INSERT`) first, and then issue
         #       and SQL `UPDATE` statement. Remember also that you will have to call `commit()` on the `Connection`
         #       stored in the `self.conn` instance variable.
-        pass
+
+        cursor = self.cursor()
+        
+
+        id = actuator.id
+        print("dette er id")
+
+        print(id)
+        print(type(id))
+
+        cursor.execute(f"update Actuators set state = {actuator.state} where id = {id};")
 
 
     # statistics
@@ -162,9 +170,6 @@ class SmartHouseRepository:
         #       SQL statements first in a SQL editor like Dbeaver and then copy it over here.  
 
         roomName = room.room_name
-
-        print("dette er romnavn")
-        print(roomName)
 
         cursor = self.cursor()
         #finding all devices in the given room
