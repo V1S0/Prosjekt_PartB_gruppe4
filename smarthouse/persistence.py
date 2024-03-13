@@ -99,6 +99,11 @@ class SmartHouseRepository:
 
        ## smarthjem.rooms = allrooms
         ##smarthjem.devices = alldevices
+                
+        cursor.execute("SELECT id from devices d where category = 'actuator'; ")
+        actuators = cursor.fetchall()
+
+        print(actuators)
 
 
         return smarthjem
@@ -155,58 +160,51 @@ class SmartHouseRepository:
         """
         # TODO: This and the following statistic method are a bit more challenging. Try to design the respective 
         #       SQL statements first in a SQL editor like Dbeaver and then copy it over here.  
-        print(room)
-        print(room)
-        print(room)
-        print(room)
-        print(room)
-        print(room)
-        print(room)
+
         roomName = room.room_name
 
         print("dette er romnavn")
         print(roomName)
 
-
-
         cursor = self.cursor()
         #finding all devices in the given room
-
         
         cursor.execute(f"select id from rooms r where name ='{roomName}';")   #kan være den returnerer en tuple og ikke int
         roomid = cursor.fetchone()
-        print(roomid)
-        print(roomid)
-        print(roomid)
-        print(roomid)
-        print(roomid)
-        print(roomid)
-        print(roomid)
-        print(roomid)
-        print(roomid[0])
-        print(type(roomid))
-        
-        """"
-        devicesInRoom = cursor.execute(f"select * from devices d where room = {roomid};")
 
-        deviceID= []
 
-        for device in devicesInRoom:
-            deviceID = device[0]
+         # Build the WHERE clause based on optional date arguments.
+        date_filter = "AND"
+        if from_date and until_date:
+         date_filter += f" m.ts >= '{from_date}' AND m.ts <= '{until_date}'"
+        elif from_date:
+            date_filter += f" m.ts >= '{from_date}'"
+        elif until_date:
+            date_filter += f" m.ts <= '{until_date}"
+            date_filter += " 23:59:59'"
+            
+        else:
+            date_filter = ""  # No date filter if both are None
 
-        for 
-        '°C'
-        """""
-        cursor.execute(f"SELECT AVG(m.value) AS avg_value FROM measurements m JOIN devices d ON m.device = d.id JOIN rooms r ON d.room = r.id WHERE m.unit = '°C' AND r.id = {roomid[0]} AND m.ts >= {from_date} AND m.ts <= {until_date};")
-        avg = cursor.fetchall()
+        # SQL query to fetch average temperatures.
+        query = f"""
+            SELECT DATE(m.ts) as DAG, AVG(m.value) AS avg_temp
+            FROM measurements m
+            JOIN devices d ON m.device = d.id
+            JOIN rooms r ON d.room = r.id
+            WHERE m.unit = '°C' AND r.id = {roomid[0]}
+            {date_filter}
+            GROUP BY DAG
+            ORDER BY DAG;
+         """
 
-        print(avg)
+        cursor.execute(query)
+        results = cursor.fetchall()
 
-        svar = {from_date: avg}
+        # Build the result dictionary.
+        avg_temperatures = {str(result[0]): result[1] for result in results}
 
-    
-
-        return svar
+        return avg_temperatures
 
     
     def calc_hours_with_humidity_above(self, room, date: str) -> list:
