@@ -42,9 +42,6 @@ class SmartHouseRepository:
         """
         cursor = self.cursor()
 
-        # Fetch all rooms
-        #cursor.execute("select * from rooms r , devices d where d.room = r.id")
-        #rooms = cursor.fetchall()
 
         #henter alle floors
         cursor.execute("SELECT DISTINCT  floor from rooms;")
@@ -57,7 +54,7 @@ class SmartHouseRepository:
         rooms = cursor.fetchall()
         allrooms = list(rooms)
 
-        #henter vi alle devices
+        #henter alle devices
         cursor.execute("select * from devices d, rooms r where d.room = r.id;")
         devices= cursor.fetchall()
         alldevices = list(devices)
@@ -68,7 +65,6 @@ class SmartHouseRepository:
             smarthjem.register_floor(f)
 
         
-        ##må finne en måte å hente ut all info pr rom for å bruke register_room
         for r in rooms:
             name = r[3]
             area = r[2]
@@ -87,8 +83,7 @@ class SmartHouseRepository:
             category = d[3]     #actuator or sensor
             supplier = d[4]
             product = d[5]
-#problem her fordi vi får rom som nummer og ikke som navn
-            #fikset nå får vi romnavnet men ikke romobjektet
+
             if category == 'sensor':
                 sensorToAdd = sensor(id, supplier, product, kind, kind,room,kind)
                 smarthjem.register_device(room, sensorToAdd)
@@ -104,12 +99,6 @@ class SmartHouseRepository:
                 actuatorToAdd = actuator(id, supplier, product, kind, kind, room, actual_state)
                 smarthjem.register_device(room, actuatorToAdd)
 
-
-       ## smarthjem.rooms = allrooms
-        ##smarthjem.devices = alldevices
-                
-        cursor.execute("SELECT id from devices d where category = 'actuator'; ")
-        actuators = cursor.fetchall()
 
 
         return smarthjem
@@ -165,8 +154,6 @@ class SmartHouseRepository:
 
 
 
-    # statistics
-
     
     def calc_avg_temperatures_in_room(self, room, from_date: Optional[str] = None, until_date: Optional[str] = None) -> dict:
         """Calculates the average temperatures in the given room for the given time range by
@@ -184,9 +171,9 @@ class SmartHouseRepository:
         roomName = room.room_name
 
         cursor = self.cursor()
-        #finding all devices in the given room
         
-        cursor.execute(f"select id from rooms r where name ='{roomName}';")   #kan være den returnerer en tuple og ikke int
+        
+        cursor.execute(f"select id from rooms r where name ='{roomName}';")   
         roomid = cursor.fetchone()
 
 
