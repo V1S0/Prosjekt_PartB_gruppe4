@@ -57,6 +57,7 @@ class SmartHouseTest(unittest.TestCase):
         self.repo.update_actuator_state(plug)
         self.assertTrue(oven.is_active())
         self.assertTrue(plug.is_active())
+
         # first reconnect
         self.repo.reconnect()
         h = self.repo.load_smarthouse_deep()
