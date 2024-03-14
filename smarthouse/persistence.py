@@ -143,14 +143,14 @@ class SmartHouseRepository:
 
         cursor = self.cursor()
         
-
+        
         id = actuator.id
         print("dette er id")
 
         print(id)
         print(type(id))
 
-        cursor.execute(f"update Actuators set state = {actuator.state} where id = {id};")
+        cursor.execute(f"update Actuators set state = {actuator.state} where id = '{id}';")
 
 
     # statistics

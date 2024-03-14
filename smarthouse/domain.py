@@ -172,9 +172,17 @@ class actuator(Device):
         return True
 
     def turn_on(self,value=None):
+        
+        if value:
+            self.state = value
+        else:
+            self.state = True
+        
+        """"
         self.state = True
         self.value = value
         return self.state
+        """
     
     def is_active(self):
         if self.state:

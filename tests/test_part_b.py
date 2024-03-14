@@ -50,6 +50,7 @@ class SmartHouseTest(unittest.TestCase):
         h = self.repo.load_smarthouse_deep()
         oven = h.get_device_by_id("8d4e4c98-21a9-4d1e-bf18-523285ad90f6")
         plug = h.get_device_by_id("1a66c3d6-22b2-446e-bf5c-eb5b9d1a8c79")
+
         oven.turn_on(24.0)
         plug.turn_on()
         self.repo.update_actuator_state(oven)
@@ -61,6 +62,7 @@ class SmartHouseTest(unittest.TestCase):
         h = self.repo.load_smarthouse_deep()
         oven = h.get_device_by_id("8d4e4c98-21a9-4d1e-bf18-523285ad90f6")
         plug = h.get_device_by_id("1a66c3d6-22b2-446e-bf5c-eb5b9d1a8c79")
+
         # activation should have been persisted
         self.assertTrue(oven.is_active())
         self.assertTrue(plug.is_active())
