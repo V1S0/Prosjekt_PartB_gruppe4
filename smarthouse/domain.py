@@ -161,9 +161,10 @@ class Device:
         
 
 class actuator(Device):
-    def __init__(self, id: str, supplier: str, model_name: str, device_type: str, nickname: str, room,  state:bool):
+    def __init__(self, id: str, supplier: str, model_name: str, device_type: str, nickname: str, room,  state:bool, value:Optional[float] = None):
         super().__init__(id, supplier, model_name, device_type, nickname, room)
         self.state = state
+        self.value = value
         
 
     def is_sensor(self):
@@ -172,11 +173,14 @@ class actuator(Device):
         return True
 
     def turn_on(self,value=None):
+        print("skur nå på: "+ self.nickname)
         
         if value:
-            self.state = value
+            self.state = True
+            self.value = value
         else:
             self.state = True
+
         
         """"
         self.state = True
@@ -185,12 +189,14 @@ class actuator(Device):
         """
     
     def is_active(self):
+
         if self.state:
             return True
         else:
             return False
         
     def turn_off(self):
+        print("skur nå av: "+ self.nickname)
         self.state = False
         
 

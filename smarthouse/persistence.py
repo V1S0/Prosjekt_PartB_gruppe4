@@ -93,7 +93,15 @@ class SmartHouseRepository:
                 sensorToAdd = sensor(id, supplier, product, kind, kind,room,kind)
                 smarthjem.register_device(room, sensorToAdd)
             if category == 'actuator':
-                actuatorToAdd = actuator(id, supplier, product, kind, kind,room, False)
+
+                cursor.execute(f"select state from Actuators a where id = '{id}';")
+                state = cursor.fetchone()
+                if state is not None:
+    # Convert the database state (integer) to a boolean and then pass it
+                    actual_state = bool(state[0])
+                else:
+                    actual_state = False  # Default state if none is found
+                actuatorToAdd = actuator(id, supplier, product, kind, kind, room, actual_state)
                 smarthjem.register_device(room, actuatorToAdd)
 
 
@@ -145,12 +153,16 @@ class SmartHouseRepository:
         
         
         id = actuator.id
-        print("dette er id")
 
-        print(id)
-        print(type(id))
+
+        print("dette er status på "+actuator.nickname)
+        print(actuator.state)
 
         cursor.execute(f"update Actuators set state = {actuator.state} where id = '{id}';")
+
+        # Commit the changes to the database
+        self.conn.commit()
+
 
 
     # statistics
@@ -219,6 +231,45 @@ class SmartHouseRepository:
         the average recorded humidity in that room at that particular time.
         The result is a (possibly empty) list of number representing hours [0-23].
         """
-        # TODO: implement
-        return NotImplemented
+        
+        room_name = room.room_name
+
+        # Connect to the database and prepare the cursor
+        cursor = self.cursor()
+
+        # Get the room ID for the given room name
+        cursor.execute(f"SELECT id FROM rooms WHERE name = '{room_name}';")
+        room_id = cursor.fetchone()
+        if room_id is None:
+            return []  # No such room
+        room_id = room_id[0]
+
+        # Calculate the average humidity for the room on the specified date
+        cursor.execute(f"""
+            SELECT AVG(m.value) as avg_humidity
+            FROM measurements m
+            JOIN devices d ON m.device = d.id
+            WHERE d.room = {room_id} AND m.unit = '%' AND DATE(m.ts) = '{date}';
+        """)
+        avg_humidity = cursor.fetchone()
+        if avg_humidity is None:
+            return []  # No measurements
+        avg_humidity = avg_humidity[0]
+
+        # Find hours where more than three measurements exceed this average humidity
+        cursor.execute(f"""
+            SELECT STRFTIME('%H', m.ts) as hour
+            FROM measurements m
+            JOIN devices d ON m.device = d.id
+            WHERE d.room = {room_id} AND m.unit = '%' AND DATE(m.ts) = '{date}'
+            AND m.value > {avg_humidity}
+            GROUP BY hour
+            HAVING COUNT(m.device) > 3;
+        """)
+        results = cursor.fetchall()
+
+        # Convert results to a list of hours
+        hours = [int(result[0]) for result in results]
+
+        return hours
 
